@@ -6,6 +6,8 @@ One environment variable, no local Zotero desktop app, no service to deploy, no 
 
 > Independent open-source project. Not affiliated with or endorsed by Zotero.
 
+**Languages:** English · [简体中文](README.zh-CN.md)
+
 ## Why this one
 
 The existing Zotero MCP servers are either light on tools or awkward to run. This one is both the
@@ -94,6 +96,72 @@ On Windows this works too — use forward slashes in the path, or double backsla
 
 </details>
 
+### NoteGen
+
+NoteGen speaks standard MCP over HTTP, so start the server in HTTP mode first:
+
+```bash
+npm run setup   # creates .env with a fresh encryption key
+npm start       # listens on http://localhost:3000
+```
+
+Then add the server in NoteGen:
+
+```json
+{
+  "mcpServers": {
+    "zotero-online": {
+      "url": "http://YOUR-HOST:3000/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_ZOTERO_API_KEY"
+      }
+    }
+  }
+}
+```
+
+> If your NoteGen build can launch local processes, use the **stdio** config above instead and
+> skip the server entirely.
+>
+> A regression test in this repo pins NoteGen's actual wire behaviour (protocol version
+> negotiation, session headers, notification and SSE response framing), so the transport layer is
+> aligned with what the app sends.
+
+### RikkaHub (Android)
+
+RikkaHub supports SSE and Streamable HTTP but **cannot** launch a local process, so a phone must
+use HTTP mode — and the phone has to be able to reach the machine running the server.
+
+**On the PC (Windows):**
+
+1. Run `setup-local.cmd` and paste your Zotero key into the generated `.env`.
+2. `npm ci && npm run build`.
+3. Run `allow-firewall.cmd` **as Administrator** to add the inbound rule for TCP 3000. It applies
+   to Private/Domain networks only, so nothing is opened on café or airport Wi-Fi.
+4. Run `start-http.cmd` to start the server.
+5. `npm run address` prints every reachable address plus ready-to-paste configs.
+
+**In RikkaHub on the phone:**
+
+| Field | Value |
+|---|---|
+| Name | `zotero` |
+| Transport type | `Streamable HTTP` |
+| Server URL | `http://192.168.x.x:3000/mcp` (your PC's LAN IP) |
+| Header | name `Authorization`, value `Bearer YOUR_ZOTERO_API_KEY` |
+
+`Bearer` and the credential are separated by exactly one space.
+
+If it will not connect, switch the transport type to `SSE` and use `/sse` instead.
+
+> The server accepts every local interface address as a valid `Host`, which is what lets a phone
+> reach `http://192.168.x.x:3000` directly. Requests carrying an unknown `Host` are still refused
+> with 403.
+>
+> **Off that network the phone cannot connect** — the physical limit of having no public entry
+> point. For access from anywhere, put the server behind a reachable domain with TLS (see
+> `compose.production.yml`).
+
 ## Configuration
 
 | Variable | Required | Purpose |
@@ -135,10 +203,11 @@ There is nothing to reach over a network and no address to configure. The practi
 
 | Client | Works? | How |
 |---|---|---|
-| Desktop app on the same PC (Cherry Studio, Claude Desktop, Cursor) | yes | steps above; nothing else needed |
+| Desktop app on the same PC (Cherry Studio, Claude Desktop, Cursor) | yes | [steps above](#quick-start); nothing else needed |
 | Desktop app on a second PC | yes | same steps on that PC — clone, build, `.env` |
+| NoteGen | yes | [stdio config](#notegen), or the HTTP URL if your build cannot launch processes |
 | A phone or tablet app that can run local processes (e.g. Termux) | yes | same steps on the device |
-| A phone or tablet app that can only connect to a URL | needs the HTTP mode below | the device must be able to reach the host |
+| RikkaHub and other URL-only mobile apps | needs the HTTP mode below | [RikkaHub setup](#rikkahub-android); the device must be able to reach the host |
 | Any client on a different network | needs the HTTP mode below | requires a host those devices can reach |
 
 **Installing it on each machine is the recommended path**, and it is what makes the setup immune to
