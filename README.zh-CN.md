@@ -165,7 +165,11 @@ npm start       # 默认监听 http://localhost:3000
 }
 ```
 
-> 若你的 NoteGen 版本支持本地进程（如桌面版支持命令启动），也可改用上面的 **stdio** 配置，无需开服务。
+> NoteGen 会按字段自动判断传输类型：有 `command` 就是 stdio，有 `url` 就是 http，所以 JSON 里不用写 `type`。
+>
+> **如果导入后没有反应**：NoteGen 会**跳过同名服务器**（不会覆盖）。请先在 MCP 服务器列表里删掉旧的同名条目再导入。
+>
+> 如果你的 NoteGen 版本支持本地进程，也可改用上面的 **stdio** 配置，无需开服务、无需防火墙、无需密钥。
 >
 > 本项目的测试套件里包含一条对照 NoteGen 真实抓包行为的回归测试（协议版本协商、会话头、通知与 SSE 响应格式），协议层已对齐。
 
@@ -233,6 +237,7 @@ HTTP 模式额外支持：
 | `ENCRYPTION_KEY` | 64 位十六进制密钥，用于加密存储用户凭据 |
 | `PASSTHROUGH_KEYS` | `true` 时客户端可直接用 Zotero key 当 Bearer 凭证，默认 `false` |
 | `TOKEN_TTL_DAYS` | 服务令牌有效期天数，`0`（默认）表示永不过期 |
+| `ALLOWED_ORIGINS` | 额外允许的网页 Origin（逗号分隔）。桌面客户端 Origin 与本机 http Origin **已默认放行**，无需配置 |
 | `SIGNUP_SECRET` | 对外开放实例前务必设置的邀请码 |
 
 完整清单见 [`.env.example`](.env.example)，安全模型见 [`SECURITY.md`](SECURITY.md)。

@@ -21,19 +21,40 @@ import type { Server } from '@modelcontextprotocol/sdk/server/index.js';
 
 type Session = { principal: Principal; transport: StreamableHTTPServerTransport | SSEServerTransport; server: Server; touched: number; };
 
-// Hosts this server answers for. Beyond the configured public origin and loopback, every local
-// interface address is accepted so a phone can reach the LAN IP directly. Without this, a request
-// carrying Host: 192.168.x.x:3000 is answered with 403 even though the port is open and reachable.
-export function allowedHostsFor(config: Config, extra: string[] = []): Set<string> {
-  const hosts = new Set<string>([new URL(config.publicUrl).host, `localhost:${config.port}`, `127.0.0.1:${config.port}`, `[::1]:${config.port}`]);
+// host:port pairs for this machine itself — loopback plus every local interface address.
+function localHosts(config: Config): Set<string> {
+  const hosts = new Set<string>([`localhost:${config.port}`, `127.0.0.1:${config.port}`, `[::1]:${config.port}`]);
   for (const addresses of Object.values(networkInterfaces())) {
     for (const address of addresses ?? []) {
       if (address.family === 'IPv4') hosts.add(`${address.address}:${config.port}`);
       else if (address.family === 'IPv6') hosts.add(`[${address.address}]:${config.port}`);
     }
   }
-  for (const host of extra) hosts.add(host);
   return hosts;
+}
+
+// Hosts this server answers for. Beyond the configured public origin and loopback, every local
+// interface address is accepted so a phone can reach the LAN IP directly. Without this, a request
+// carrying Host: 192.168.x.x:3000 is answered with 403 even though the port is open and reachable.
+export function allowedHostsFor(config: Config, extra: string[] = []): Set<string> {
+  return new Set<string>([new URL(config.publicUrl).host, ...localHosts(config), ...extra]);
+}
+
+// Origins allowed to call this API. Three groups beyond the operator's ALLOWED_ORIGINS list:
+//  1. The configured public origin.
+//  2. This machine's own http origins, so the landing page works when opened by LAN IP.
+//  3. Desktop MCP client origins. Tauri apps (NoteGen) fetch through Rust and present their app
+//     origin — tauri://localhost on macOS/Linux, http(s)://tauri.localhost on Windows. With an
+//     empty ALLOWED_ORIGINS these were refused with 403, which is indistinguishable from "this
+//     client cannot connect at all".
+// Groups 2 and 3 are not origins a hostile page can occupy: browsers resolve *.localhost to
+// loopback by specification, and custom schemes only exist inside native apps. Every other web
+// origin still has to be listed explicitly.
+export function allowedOriginsFor(config: Config): Set<string> {
+  const origins = new Set<string>([...config.origins, new URL(config.publicUrl).origin]);
+  for (const host of localHosts(config)) origins.add(`http://${host}`);
+  for (const origin of ['tauri://localhost', 'http://tauri.localhost', 'https://tauri.localhost']) origins.add(origin);
+  return origins;
 }
 export function createApp(config: Config, options: { store?: Store; fetcher?: Fetcher } = {}) {
   const store = options.store ?? new Store(config.databasePath, config.encryptionKey), fetcher = options.fetcher ?? fetch;
@@ -48,7 +69,7 @@ export function createApp(config: Config, options: { store?: Store; fetcher?: Fe
     const host = req.get('host'), allowedHosts = allowedHostsFor(config);
     if (!host || !allowedHosts.has(host)) return res.status(403).json({ error: 'Invalid Host header' });
     const origin = req.get('origin');
-    if (origin && !config.origins.includes(origin)) return res.status(403).json({ error: 'Origin is not allowed' });
+    if (origin && !allowedOriginsFor(config).has(origin)) return res.status(403).json({ error: 'Origin is not allowed' });
     if (origin) { res.set('Access-Control-Allow-Origin', origin); res.vary('Origin'); }
     res.set('Access-Control-Allow-Headers', 'Authorization, Content-Type, Mcp-Session-Id, MCP-Protocol-Version, Last-Event-ID');
     res.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');

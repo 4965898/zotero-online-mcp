@@ -33,7 +33,10 @@ export async function running(fetcher: Fetcher, overrides: Partial<Config> = {})
   const cfg = { ...config(), ...overrides }; const service = createApp(cfg, { fetcher });
   const http = service.app.listen(0, '127.0.0.1');
   await new Promise<void>(resolve => http.once('listening', resolve));
-  cfg.port = (http.address() as any).port; cfg.publicUrl = `http://127.0.0.1:${cfg.port}`; cfg.origins = [cfg.publicUrl];
+  cfg.port = (http.address() as any).port; cfg.publicUrl = `http://127.0.0.1:${cfg.port}`;
+  // The test server must allow its own origin; origins passed in by the caller are kept, not
+  // replaced, so tests can exercise the ALLOWED_ORIGINS path.
+  cfg.origins = [cfg.publicUrl, ...cfg.origins];
   const connect = async (key = 'A'.repeat(24)) => {
     const r = await fetch(cfg.publicUrl + '/api/connect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiKey: key, signupSecret: cfg.signupSecret }) });
     if (!r.ok) throw new Error(await r.text()); return (await r.json()).access_token as string;

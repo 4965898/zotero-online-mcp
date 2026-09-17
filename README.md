@@ -120,6 +120,12 @@ Then add the server in NoteGen:
 }
 ```
 
+> NoteGen infers the transport from the fields: `command` means stdio, `url` means http, so the JSON
+> needs no `type`.
+>
+> **If the import appears to do nothing**, NoteGen skips servers whose name already exists — it never
+> overwrites. Delete the old entry in the MCP server list and import again.
+>
 > If your NoteGen build can launch local processes, use the **stdio** config above instead and
 > skip the server entirely.
 >
@@ -174,6 +180,7 @@ If it will not connect, switch the transport type to `SSE` and use `/sse` instea
 | `EMBEDDING_API_KEY` | no | Key for the embedding endpoint |
 | `MAX_FILE_MB` | no | Attachment size limit, default `20` |
 | `PASSTHROUGH_KEYS` | no | HTTP mode only. `true` lets clients send their Zotero key as the bearer credential instead of a service token. Default `false` |
+| `ALLOWED_ORIGINS` | no | Extra web origins to admit (comma separated). Desktop client origins and this machine's own http origins are already allowed by default |
 
 ### Writes are opt-in and always previewed
 

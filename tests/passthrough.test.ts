@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { fixture, json, running } from './helpers.js';
-import { allowedHostsFor } from '../src/server.js';
+import { allowedHostsFor, allowedOriginsFor } from '../src/server.js';
 import type { Fetcher } from '../src/zotero.js';
 
 // A Zotero API key is a 24-character alphanumeric string, which is shorter than the service tokens
@@ -138,6 +138,34 @@ test('local interface addresses are accepted as Host values', async () => {
     }
     // The allowlist must still reject anything that is not this machine.
     assert.equal(hosts.has('evil.example'), false);
+  } finally { await s.close(); }
+});
+
+// Desktop MCP clients fetch from their native runtime and present their own app origin instead of
+// a web origin. NoteGen is a Tauri app: tauri://localhost on macOS/Linux, http(s)://tauri.localhost
+// on Windows. With ALLOWED_ORIGINS empty every one of those was answered with 403, which looks
+// exactly like "NoteGen cannot connect while Cherry Studio works" — Cherry Studio sends no Origin.
+test('desktop app origins and local http origins are accepted; foreign web origins are not', async () => {
+  const f = fixture(), s = await running(f.fetcher, { passthroughKeys: true });
+  try {
+    const origins = allowedOriginsFor(s.config);
+    for (const origin of ['tauri://localhost', 'http://tauri.localhost', 'https://tauri.localhost']) {
+      assert.ok(origins.has(origin), `${origin} must be allowed`);
+      assert.equal((await fetch(s.url + '/healthz', { headers: { Origin: origin } })).status, 200, `${origin} must be answered`);
+    }
+    // Local http origins, so the landing page works when opened by LAN IP.
+    const lan = [...origins].find(o => /^http:\/\/(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(o));
+    if (lan) assert.equal((await fetch(s.url + '/healthz', { headers: { Origin: lan } })).status, 200, `${lan} must be answered`);
+    assert.ok(origins.has(`http://127.0.0.1:${s.config.port}`), 'loopback origin must be allowed');
+    // A real web origin is still refused, and would-be attackers cannot borrow the desktop origins.
+    assert.equal((await fetch(s.url + '/healthz', { headers: { Origin: 'https://evil.example' } })).status, 403);
+    assert.equal(origins.has('https://evil.example'), false);
+    // Operators can still admit extra origins explicitly.
+    const alt = await running(f.fetcher, { passthroughKeys: true, origins: ['https://notes.example'] });
+    try {
+      assert.equal((await fetch(alt.url + '/healthz', { headers: { Origin: 'https://notes.example' } })).status, 200);
+      assert.equal((await fetch(alt.url + '/healthz', { headers: { Origin: 'https://other.example' } })).status, 403);
+    } finally { await alt.close(); }
   } finally { await s.close(); }
 });
 
