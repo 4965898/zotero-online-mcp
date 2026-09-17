@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "zotero-online": {
+      "type": "sse",
+      "url": "https://mcp.example.com/sse",
+      "headers": {
+        "Authorization": "Bearer REPLACE_WITH_YOUR_SERVICE_TOKEN"
+      }
+    }
+  }
+}

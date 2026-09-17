@@ -1,0 +1,4214 @@
+[
+  {
+    "name": "get_libraries",
+    "description": "List your personal library and accessible group libraries.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_key_permissions",
+    "description": "Inspect Zotero key permissions without returning the key.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "search_libraries",
+    "description": "Search up to 10 explicitly selected personal/group libraries. Each library reports its own results or error; no implicit cross-library selection.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "libraries": {
+          "minItems": 1,
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "user",
+                  "group"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[1-9]\\d*$"
+              }
+            },
+            "required": [
+              "type",
+              "id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "libraries",
+        "query",
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "search_library",
+    "description": "Search online titles, creators, years, tags, item types, or synced full text. Includes pagination metadata.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "q": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "qmode": {
+          "type": "string",
+          "enum": [
+            "titleCreatorYear",
+            "everything"
+          ]
+        },
+        "tags": {
+          "description": "Repeated tags use AND; use || within a tag for OR and a leading - for NOT.",
+          "maxItems": 30,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 255
+          }
+        },
+        "itemType": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "since": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sort": {
+          "type": "string",
+          "enum": [
+            "dateAdded",
+            "dateModified",
+            "title",
+            "creator",
+            "itemType",
+            "date",
+            "publicationTitle"
+          ]
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "required": [
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_recent",
+    "description": "Get recently added online items.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_item_details",
+    "description": "Get an item including editable metadata and version.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        }
+      },
+      "required": [
+        "itemKey"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_items_batch",
+    "description": "Fetch up to 50 items by their keys; compare returned keys for inaccessible or missing items.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKeys": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        }
+      },
+      "required": [
+        "itemKeys"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_item_children",
+    "description": "List child attachments, notes and annotations with pagination.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "itemKey",
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_item_abstract",
+    "description": "Read the stored abstract without retrieving attachments.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        }
+      },
+      "required": [
+        "itemKey"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_trash",
+    "description": "List items in the online trash.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_publications",
+    "description": "List My Publications from your personal library.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_collections",
+    "description": "List collections; use topOnly for root collections.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "topOnly": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "start",
+        "limit",
+        "topOnly"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_collection_details",
+    "description": "Get a collection and its current version.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "collectionKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        }
+      },
+      "required": [
+        "collectionKey"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_collection_items",
+    "description": "List items in a collection.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "collectionKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "q": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "qmode": {
+          "type": "string",
+          "enum": [
+            "titleCreatorYear",
+            "everything"
+          ]
+        },
+        "tags": {
+          "description": "Repeated tags use AND; use || within a tag for OR and a leading - for NOT.",
+          "maxItems": 30,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 255
+          }
+        },
+        "itemType": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "since": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sort": {
+          "type": "string",
+          "enum": [
+            "dateAdded",
+            "dateModified",
+            "title",
+            "creator",
+            "itemType",
+            "date",
+            "publicationTitle"
+          ]
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        },
+        "topOnly": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "collectionKey",
+        "start",
+        "limit",
+        "topOnly"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_subcollections",
+    "description": "List direct child collections.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "collectionKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "collectionKey",
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "search_collections",
+    "description": "Find collections by case-insensitive name within a bounded scan; reports incomplete scans.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": {
+          "default": 500,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        }
+      },
+      "required": [
+        "maxItems",
+        "query"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_collection_tree",
+    "description": "Build collection hierarchy from a bounded remote scan; missing parents remain visible.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": {
+          "default": 500,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        }
+      },
+      "required": [
+        "maxItems"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_tags",
+    "description": "List library or collection tags.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "collectionKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "q": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_item_tags",
+    "description": "List tags assigned to one item.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        }
+      },
+      "required": [
+        "itemKey"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_saved_searches",
+    "description": "List saved search definitions. Zotero Web API does not execute saved searches.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_saved_search",
+    "description": "Read a saved search definition.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "searchKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        }
+      },
+      "required": [
+        "searchKey"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_item_types",
+    "description": "List official Zotero item types.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_item_fields",
+    "description": "List valid fields for an item type.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "itemType": {
+          "type": "string",
+          "pattern": "^[a-zA-Z]+$"
+        }
+      },
+      "required": [
+        "itemType"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_creator_types",
+    "description": "List valid creator roles for an item type.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "itemType": {
+          "type": "string",
+          "pattern": "^[a-zA-Z]+$"
+        }
+      },
+      "required": [
+        "itemType"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_item_template",
+    "description": "Get an official editable item template before creation.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "itemType": {
+          "type": "string",
+          "pattern": "^[a-zA-Z]+$"
+        },
+        "linkMode": {
+          "type": "string",
+          "enum": [
+            "imported_file",
+            "imported_url",
+            "linked_url"
+          ]
+        },
+        "annotationType": {
+          "type": "string",
+          "enum": [
+            "highlight",
+            "underline",
+            "note",
+            "image",
+            "ink",
+            "text"
+          ]
+        }
+      },
+      "required": [
+        "itemType"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_sync_versions",
+    "description": "Get remote object versions since a library version.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "since": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "items",
+            "collections",
+            "searches"
+          ]
+        }
+      },
+      "required": [
+        "since",
+        "kind"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_deleted",
+    "description": "Get deletion log since a library version.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "since": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "since"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_fulltext_versions",
+    "description": "List attachments with synced full-text changes since a version.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "since": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "since"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_item_fulltext",
+    "description": "Read synced full text of an attachment with explicit character paging. 404 means missing or unsynced content.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "offset": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxChars": {
+          "default": 20000,
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 100000
+        }
+      },
+      "required": [
+        "itemKey",
+        "offset",
+        "maxChars"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "search_fulltext",
+    "description": "Search Zotero synced full text using its everything search mode.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        }
+      },
+      "required": [
+        "start",
+        "limit",
+        "query"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_content",
+    "description": "Get abstract, notes and synced attachment text. Mode bounds output; each missing source is reported.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "mode": {
+          "default": "standard",
+          "type": "string",
+          "enum": [
+            "minimal",
+            "preview",
+            "standard",
+            "complete"
+          ]
+        },
+        "maxItems": {
+          "default": 500,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        }
+      },
+      "required": [
+        "itemKey",
+        "mode",
+        "maxItems"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_notes",
+    "description": "List notes; query matches note HTML/text within the scanned page set.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": {
+          "default": 500,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        },
+        "query": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "maxItems"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_annotations",
+    "description": "List synced Zotero annotations under one attachment.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "start": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "default": 25,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "itemKey",
+        "start",
+        "limit"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "search_annotations",
+    "description": "Filter synced annotations by text, comment, color and tags within a bounded scan.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": {
+          "default": 500,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        },
+        "query": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "tag": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "maxItems"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "synthesize_annotations",
+    "description": "Group synced annotation excerpts and comments by attachment for a literature digest. No AI-generated claims.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": {
+          "default": 500,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        }
+      },
+      "required": [
+        "maxItems"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "export_items",
+    "description": "Export up to 50 selected items as BibTeX, BibLaTeX, RIS, CSL JSON, CSV or other official formats.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKeys": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "bibtex",
+            "biblatex",
+            "ris",
+            "csljson",
+            "csv",
+            "mods",
+            "tei",
+            "rdf_zotero",
+            "wikipedia"
+          ]
+        }
+      },
+      "required": [
+        "itemKeys",
+        "format"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_bibliography",
+    "description": "Generate a formatted bibliography using an official CSL style id.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKeys": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        },
+        "style": {
+          "default": "apa",
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "locale": {
+          "default": "en-US",
+          "type": "string",
+          "pattern": "^[a-z]{2}-[A-Z]{2}$"
+        }
+      },
+      "required": [
+        "itemKeys",
+        "style",
+        "locale"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_citations",
+    "description": "Get formatted in-text citations for selected items.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKeys": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        },
+        "style": {
+          "default": "apa",
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "locale": {
+          "default": "en-US",
+          "type": "string"
+        }
+      },
+      "required": [
+        "itemKeys",
+        "style",
+        "locale"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "download_attachment",
+    "description": "Download a synced Zotero Storage attachment as base64. Size limited; no local filesystem or arbitrary URL access.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        }
+      },
+      "required": [
+        "itemKey"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "create_item",
+    "description": "Create a bibliographic item from Zotero editable JSON. Use get_item_template for supported fields. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "data": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "create_items_batch",
+    "description": "Create up to 50 items with partial-failure reporting. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "items": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "update_item",
+    "description": "Patch selected metadata fields using the version from a preceding read. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "patch": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "itemKey",
+        "version",
+        "patch"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "update_items_batch",
+    "description": "Patch up to 50 items with explicit object versions; arrays replace their entire fields. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "updates": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Z0-9]{8}$"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "patch": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              }
+            },
+            "required": [
+              "key",
+              "version",
+              "patch"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "updates"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "trash_item",
+    "description": "Move an item to trash with version protection. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "itemKey",
+        "version"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "restore_item",
+    "description": "Restore a trashed item with version protection. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "itemKey",
+        "version"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "delete_item",
+    "description": "PERMANENTLY delete an item. Preview includes its metadata; children may also be removed by Zotero. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "itemKey",
+        "version"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "create_note",
+    "description": "Create a standalone note or child note using Zotero note HTML. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "parentItem": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "html": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100000
+        },
+        "tags": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "html",
+        "tags"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "update_note",
+    "description": "Update an existing note, retaining other fields. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "html": {
+          "type": "string",
+          "maxLength": 100000
+        }
+      },
+      "required": [
+        "itemKey",
+        "version",
+        "html"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "create_annotation",
+    "description": "Create a synced annotation under an attachment. Supply valid Zotero position JSON and sort index from the document geometry. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "parentItem": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "highlight",
+            "underline",
+            "note",
+            "image",
+            "ink",
+            "text"
+          ]
+        },
+        "text": {
+          "default": "",
+          "type": "string"
+        },
+        "comment": {
+          "default": "",
+          "type": "string"
+        },
+        "color": {
+          "default": "#ffd400",
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "pageLabel": {
+          "type": "string"
+        },
+        "sortIndex": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "position": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "parentItem",
+        "type",
+        "text",
+        "comment",
+        "color",
+        "pageLabel",
+        "sortIndex",
+        "position"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "update_annotation",
+    "description": "Update annotation text, comment, color or tags. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "text": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "itemKey",
+        "version"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "create_collection",
+    "description": "Create a collection, optionally under a parent. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "parentCollection": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "update_collection",
+    "description": "Rename or reparent a collection; null moves it to the root. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "collectionKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "parentCollection": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Z0-9]{8}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "collectionKey",
+        "version"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "delete_collection",
+    "description": "Permanently delete a collection and its subcollections; this does not delete the member items. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "collectionKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "collectionKey",
+        "version"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "manage_item_collections",
+    "description": "Add or remove collection memberships on up to 50 items, preserving other memberships. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKeys": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        },
+        "collectionKeys": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "add",
+            "remove"
+          ]
+        }
+      },
+      "required": [
+        "itemKeys",
+        "collectionKeys",
+        "action"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "manage_tags",
+    "description": "Add or remove tags on up to 50 items, preserving untouched tags and their types. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKeys": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        },
+        "tags": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "add",
+            "remove"
+          ]
+        }
+      },
+      "required": [
+        "itemKeys",
+        "tags",
+        "action"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "set_item_parent",
+    "description": "Set or clear the parent of a note or attachment; null makes it standalone. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "parentItem": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Z0-9]{8}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "itemKey",
+        "version",
+        "parentItem"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_item_related",
+    "description": "Read explicit item relations.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        }
+      },
+      "required": [
+        "itemKey"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "manage_relation",
+    "description": "Add or remove a bidirectional dc:relation between two items in one library. Batch outcomes are reported per item. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "relatedItemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "add",
+            "remove"
+          ]
+        }
+      },
+      "required": [
+        "itemKey",
+        "relatedItemKey",
+        "action"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "create_saved_search",
+    "description": "Create a saved search definition; conditions follow Zotero API syntax. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "conditions": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "condition",
+              "operator",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "name",
+        "conditions"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "update_saved_search",
+    "description": "Update a saved search definition using versioned batch-write semantics. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "searchKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "conditions": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "condition",
+              "operator",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "searchKey",
+        "version",
+        "name",
+        "conditions"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "delete_saved_search",
+    "description": "Delete one saved search definition with object and library version protection. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "searchKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "searchKey",
+        "version"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "create_attachment",
+    "description": "Create an attachment record. Use upload_attachment next to upload bytes for imported_file; linked_url stores only a remote link. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "parentItem": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "filename": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "contentType": {
+          "default": "application/pdf",
+          "type": "string",
+          "maxLength": 100
+        },
+        "linkMode": {
+          "default": "imported_file",
+          "type": "string",
+          "enum": [
+            "imported_file",
+            "linked_url"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "title",
+        "contentType",
+        "linkMode"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "upload_attachment",
+    "description": "Upload or replace bytes for an existing Zotero Storage attachment using authorization, storage upload, and registration. Base64 size is bounded. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "base64": {
+          "type": "string",
+          "minLength": 4
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+        },
+        "mtime": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "itemKey",
+        "version",
+        "base64",
+        "filename",
+        "mtime"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "set_fulltext",
+    "description": "Upload extracted text to the online full-text index; this does not upload the source file. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 1000000
+        },
+        "indexedPages": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "totalPages": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "itemKey",
+        "content"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "execute_write",
+    "description": "Execute a prepared plan ONLY after the user explicitly approves its preview. Consumes its tenant-bound token once, including on upstream failure.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "confirmationToken": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "confirmationToken"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "advanced_search",
+    "description": "Apply AND/OR field filters to a bounded scan of remote items. Reports scan truncation; does not claim whole-library results when bounded.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": {
+          "default": 500,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        },
+        "match": {
+          "default": "all",
+          "type": "string",
+          "enum": [
+            "all",
+            "any"
+          ]
+        },
+        "filters": {
+          "minItems": 1,
+          "maxItems": 20,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string",
+                "enum": [
+                  "title",
+                  "creator",
+                  "date",
+                  "DOI",
+                  "ISBN",
+                  "abstractNote",
+                  "extra",
+                  "tag",
+                  "itemType"
+                ]
+              },
+              "operator": {
+                "type": "string",
+                "enum": [
+                  "contains",
+                  "equals",
+                  "startsWith",
+                  "notContains"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 10000
+              }
+            },
+            "required": [
+              "field",
+              "operator",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "maxItems",
+        "match",
+        "filters"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "find_duplicates",
+    "description": "Identify candidate duplicates by normalized DOI or title. Does not merge; title matches require human review.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": {
+          "default": 500,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        },
+        "by": {
+          "default": "DOI",
+          "type": "string",
+          "enum": [
+            "DOI",
+            "title"
+          ]
+        }
+      },
+      "required": [
+        "maxItems",
+        "by"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_library_stats",
+    "description": "Compute item-type, year and tag counts for a bounded remote sample; includes total and coverage.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": {
+          "default": 500,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        }
+      },
+      "required": [
+        "maxItems"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "merge_duplicates",
+    "description": "Consolidate two explicitly chosen same-type bibliographic items. Keep primary metadata, fill empty fields, union tags/collections/relations, move children, then trash the secondary. This is not the desktop native merge: incoming links from other items are not rewritten. Partial failures stop before trash. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "primaryKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "secondaryKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "primaryVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "secondaryVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "primaryKey",
+        "secondaryKey",
+        "primaryVersion",
+        "secondaryVersion"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "search_by_citation_key",
+    "description": "Look up an explicitly stored Citation Key in Extra. Better BibTeX local generated keys are not remotely available.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": {
+          "default": 500,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        },
+        "citationKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        }
+      },
+      "required": [
+        "maxItems",
+        "citationKey"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "add_by_doi",
+    "description": "Resolve a DOI through Crossref and preview a Zotero item. Only the identifier is sent to Crossref. Does not download publisher PDFs. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "doi": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 300
+        },
+        "collections": {
+          "default": [],
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        }
+      },
+      "required": [
+        "doi",
+        "collections"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "add_by_isbn",
+    "description": "Resolve a book ISBN through Open Library and preview a Zotero book. Only the ISBN is sent externally. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "isbn": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "collections": {
+          "default": [],
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        }
+      },
+      "required": [
+        "isbn",
+        "collections"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "add_by_url",
+    "description": "Create a webpage reference from a user-provided HTTP(S) URL and title. Does not scrape the URL or guess scholarly metadata. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "collections": {
+          "default": [],
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        }
+      },
+      "required": [
+        "url",
+        "title",
+        "collections"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "import_csl_json",
+    "description": "Import up to 50 CSL JSON references. Supported types and mapped fields are documented; preview all converted metadata. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "items": {
+          "minItems": 1,
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "collections": {
+          "default": [],
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        }
+      },
+      "required": [
+        "items",
+        "collections"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "import_bibliography",
+    "description": "Parse inline BibTeX or RIS without filesystem access or network resolution; preview converted CSL metadata before creating items. Returns an exact write preview and confirmation token; it does not write until execute_write is explicitly approved.",
+    "write": true,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 250000
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "bibtex",
+            "ris"
+          ]
+        },
+        "collections": {
+          "default": [],
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8}$"
+          }
+        }
+      },
+      "required": [
+        "text",
+        "format",
+        "collections"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "read_pdf_pages",
+    "description": "Extract text from up to 10 pages of a synced PDF in an isolated parser. Scanned pages may have no text; no OCR or image rendering.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "startPage": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "endPage": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "itemKey",
+        "startPage",
+        "endPage"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_pdf_outline",
+    "description": "Extract a synced PDF table of contents. Files without bookmarks return an empty outline.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        }
+      },
+      "required": [
+        "itemKey"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "build_semantic_index",
+    "description": "Build an ephemeral, tenant-isolated semantic index of online titles and abstracts (max 500 items). Sends those texts to the configured embedding provider only with explicit consent.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": {
+          "default": 100,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        },
+        "consentToExternalProcessing": {
+          "type": "boolean",
+          "const": true,
+          "description": "User explicitly agreed to send titles, abstracts or search text to the operator-configured embedding provider."
+        }
+      },
+      "required": [
+        "maxItems",
+        "consentToExternalProcessing"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "semantic_status",
+    "description": "Report semantic provider configuration and current library index coverage.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "semantic_search",
+    "description": "Rank the current online-library index with real embedding cosine similarity; requires a configured provider and fresh index.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "limit": {
+          "default": 10,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "consentToExternalProcessing": {
+          "type": "boolean",
+          "const": true,
+          "description": "User explicitly agreed to send titles, abstracts or search text to the operator-configured embedding provider."
+        }
+      },
+      "required": [
+        "query",
+        "limit",
+        "consentToExternalProcessing"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "find_similar",
+    "description": "Find semantically related online items using a source title and abstract.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "itemKey": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{8}$"
+        },
+        "limit": {
+          "default": 10,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "consentToExternalProcessing": {
+          "type": "boolean",
+          "const": true,
+          "description": "User explicitly agreed to send titles, abstracts or search text to the operator-configured embedding provider."
+        }
+      },
+      "required": [
+        "itemKey",
+        "limit",
+        "consentToExternalProcessing"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "clear_semantic_index",
+    "description": "Clear only your current library semantic index from server memory.",
+    "write": false,
+    "inputSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Defaults to your personal online library. Pass a group id explicitly for a group library.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "group"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[1-9]\\d*$"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+]

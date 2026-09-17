@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "zotero-online": {
+      "url": "https://mcp.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer REPLACE_WITH_YOUR_SERVICE_TOKEN"
+      }
+    }
+  }
+}

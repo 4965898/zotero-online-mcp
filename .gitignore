@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+!.env.local.example
+data/
+.research/
+.workbuddy/
+.npm-cache/
+coverage/
+*.log
+*.db*
+test-results/
+.test-build/

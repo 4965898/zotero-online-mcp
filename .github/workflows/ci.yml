@@ -1,0 +1,42 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run docs:tools
+      - run: git diff --exit-code -- docs/TOOLS.md docs/tools.json
+      - run: npm audit --omit=dev --audit-level=high
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t zotero-online-mcp:test .
+      - name: Check non-root container and health
+        shell: bash
+        run: |
+          key=$(openssl rand -hex 32)
+          docker run -d --name smoke -e ENCRYPTION_KEY="$key" -e PUBLIC_URL=http://localhost:3000 -p 127.0.0.1:3000:3000 zotero-online-mcp:test
+          trap 'docker logs smoke; docker rm -f smoke' EXIT
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:3000/healthz; then
+              test "$(docker exec smoke id -u)" != 0
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1

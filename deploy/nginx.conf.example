@@ -1,0 +1,13 @@
+# Add inside a TLS-enabled server block. Preserve Host so PUBLIC_URL validation works.
+location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_read_timeout 3600s;
+    proxy_send_timeout 180s;
+    client_max_body_size 32m;
+}

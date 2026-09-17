@@ -1,0 +1,10 @@
+import { writeFile, mkdir } from 'node:fs/promises';
+import { z } from 'zod';
+import { tools } from '../dist/tools.js';
+import '../dist/extensions.js';
+await mkdir('docs', { recursive: true });
+const records = tools.map(t => ({ name: t.name, description: t.description, write: t.write, inputSchema: z.toJSONSchema(t.schema) }));
+await writeFile('docs/tools.json', JSON.stringify(records, null, 2) + '\n');
+const text = '# Tool catalog\n\nGenerated from the registered schemas with `npm run docs:tools`. Do not edit manually.\n\n' + `${tools.length} tools (${tools.filter(t => t.write).length} write/workflow tools). Write tools are absent when ENABLE_WRITES=false.\n\n` + tools.map(t => `## ${t.name}\n\n${t.description}\n\nMode: **${t.write ? 'write preview / execution' : 'read / research'}**\n\n\`\`\`json\n${JSON.stringify(z.toJSONSchema(t.schema), null, 2)}\n\`\`\`\n`).join('\n');
+await writeFile('docs/TOOLS.md', text);
+console.log(`Documented ${tools.length} tools`);
