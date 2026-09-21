@@ -270,6 +270,41 @@ Windows 单用户场景最常用的四个脚本：
 
 `npm run address` 可以单独打印同样的信息：本机所有可达地址，以及 Cherry Studio、RikkaHub 和 stdio 客户端可直接粘贴的配置。
 
+### 可选：注册成真正的 Windows 服务
+
+`start-http.cmd` 是前台窗口方式，关掉窗口服务就停了，重启电脑也不会自己起来。如果需要**开机自启（不用登录）、没有窗口、崩溃自动重启**，把它注册成 Windows 服务即可。这里用 [nssm](https://nssm.cc/download)（约 300KB，免费）：
+
+以**管理员身份**打开 PowerShell，在项目目录下执行：
+
+```powershell
+$nssm = 'C:\tools\nssm.exe'                     # 改成你解压出的 nssm.exe 路径
+$proj = (Get-Location).Path
+$node = 'C:\Program Files\nodejs\node.exe'      # 你的 node.exe
+
+& $nssm install ZoteroMcpHttp $node '--env-file-if-exists=.env' 'dist/main.js'
+& $nssm set ZoteroMcpHttp AppDirectory $proj
+& $nssm set ZoteroMcpHttp DisplayName 'Zotero MCP HTTP Service'
+& $nssm set ZoteroMcpHttp Start SERVICE_AUTO_START        # 开机自启，不需要登录
+& $nssm set ZoteroMcpHttp AppExit Default Restart         # 崩溃后自动重启
+& $nssm set ZoteroMcpHttp AppRestartDelay 5000
+& $nssm set ZoteroMcpHttp AppStdout "$proj\data\service.log"
+& $nssm set ZoteroMcpHttp AppStderr "$proj\data\service.log"
+& $nssm set ZoteroMcpHttp AppRotateFiles 1                # 日志按大小轮转
+& $nssm set ZoteroMcpHttp AppRotateBytes 1048576
+Start-Service ZoteroMcpHttp
+```
+
+`AppDirectory` 这一项不能省：服务端是按**工作目录**去找 `.env` 和 `data/` 的。服务以 `LocalSystem` 运行，不依赖任何用户登录会话。
+
+```powershell
+Get-Service ZoteroMcpHttp              # 看状态
+Restart-Service ZoteroMcpHttp          # 重启
+Stop-Service ZoteroMcpHttp             # 停止
+& $nssm remove ZoteroMcpHttp confirm   # 卸载服务
+```
+
+实测行为：占用 3000 端口的是 `nssm.exe` 的子进程 `node.exe`；杀掉该子进程后，会在重启延迟内拉起一个新进程，`GET /healthz` 重新返回 200。
+
 ## 直接用 Zotero API key 当凭证
 
 默认情况下客户端发送的是本服务签发的**服务令牌**。如果你不想多这一步，设置 `PASSTHROUGH_KEYS=true`，客户端改为直接发送 **Zotero API key** 作为 Bearer 凭证——无需生成任何东西，也不用从首页复制令牌：

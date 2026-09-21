@@ -254,6 +254,44 @@ can be reached at plus ready-to-paste configs for Cherry Studio, RikkaHub and st
 > reach `http://192.168.x.x:3000` directly. Requests carrying an unknown `Host` are still refused
 > with 403.
 
+### Optional: install it as a real Windows service
+
+`start-http.cmd` runs in a console window, so closing that window stops the server and nothing
+starts it again at boot. For an unattended host, register it as a Windows service instead — it then
+starts **before anyone logs in**, has no window, and **restarts by itself after a crash**. [nssm](https://nssm.cc/download)
+is a ~300KB free wrapper that does this. In an **elevated** PowerShell, from the project directory:
+
+```powershell
+$nssm = 'C:\tools\nssm.exe'                      # wherever you unzipped nssm.exe
+$proj = (Get-Location).Path
+$node = 'C:\Program Files\nodejs\node.exe'       # your node.exe
+
+& $nssm install ZoteroMcpHttp $node '--env-file-if-exists=.env' 'dist/main.js'
+& $nssm set ZoteroMcpHttp AppDirectory $proj
+& $nssm set ZoteroMcpHttp DisplayName 'Zotero MCP HTTP Service'
+& $nssm set ZoteroMcpHttp Start SERVICE_AUTO_START        # boot start, no login required
+& $nssm set ZoteroMcpHttp AppExit Default Restart         # restart after a crash
+& $nssm set ZoteroMcpHttp AppRestartDelay 5000
+& $nssm set ZoteroMcpHttp AppStdout "$proj\data\service.log"
+& $nssm set ZoteroMcpHttp AppStderr "$proj\data\service.log"
+& $nssm set ZoteroMcpHttp AppRotateFiles 1                # rotate the log by size
+& $nssm set ZoteroMcpHttp AppRotateBytes 1048576
+Start-Service ZoteroMcpHttp
+```
+
+`AppDirectory` matters: the server resolves `.env` and `data/` relative to the working directory.
+The service runs as `LocalSystem`, so no user session is involved.
+
+```powershell
+Get-Service ZoteroMcpHttp              # status
+Restart-Service ZoteroMcpHttp          # restart
+Stop-Service ZoteroMcpHttp             # stop
+& $nssm remove ZoteroMcpHttp confirm   # uninstall
+```
+
+Verified behaviour: the listening process is a `node.exe` child of `nssm.exe`, killing that child
+brings a new one up within the restart delay, and `GET /healthz` answers 200 again.
+
 ### Sending the Zotero key directly
 
 By default a client sends a **service token** issued by this server. If you would rather skip that
