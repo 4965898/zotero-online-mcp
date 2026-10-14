@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim AS build
+FROM node:26-bookworm-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
 RUN npm ci
@@ -6,7 +6,7 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build && npm prune --omit=dev && rm -rf .npm-cache
 
-FROM node:24-bookworm-slim AS runtime
+FROM node:26-bookworm-slim AS runtime
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000 DATABASE_PATH=/app/data/service.sqlite
 WORKDIR /app
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
